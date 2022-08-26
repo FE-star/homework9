@@ -10,16 +10,12 @@
   </div>
 </template>
 
-<script>
-// TODO 利用事件代理实现一个简单的收集spm信息的方法，注意不是针对每一个按钮进行函数绑定。场景：考虑一下如果一个页面中有很多按钮，需要如何处理
-export default {
-  name: 'HelloWorld',
-  data: ()=>{
-    return {
-      spmText: 'xx.xx.xx'
-    }
-  }
-}
+<script setup>
+import useSPM from "@/components/useSPM";
+import {computed} from "vue";
+
+const spm = useSPM()
+const spmText = computed(() => spm.value.join('.'))
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
