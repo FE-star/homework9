@@ -1,6 +1,5 @@
 import { shallowMount, mount } from '@vue/test-utils'
 import HelloWorld from '@/components/HelloWorld.vue';
-import { warn } from 'vue';
 
 jest.setTimeout(10000)
 describe('HelloWorld.vue', () => {

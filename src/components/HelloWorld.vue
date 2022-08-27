@@ -10,35 +10,11 @@
   </div>
 </template>
 
-<script>
-/* eslint-disable */
-// TODO 利用事件代理实现一个简单的收集spm信息的方法，注意不是针对每一个按钮进行函数绑定。场景：考虑一下如果一个页面中有很多按钮，需要如何处理
-import { useSpm } from '../hooks/useSpm';
-export default {
-  name: 'HelloWorld',
-  data: () => {
-    return {
-      spmText: '1'
-    }
-  },
-  setup() {
-    const { spmText } = useSpm();
-    return { reportText: spmText };
-  },
-  watch: {
-    reportText(value) {
-      this.spmText = value;
-    }
-  }
-}
-</script>
-<!-- <script setup>
+<script setup>
 /* eslint-disable */
 import { useSpm } from '../hooks/useSpm';
-import { ref } from 'vue';
-// const spmText1 = ref('123');
 const { spmText } = useSpm();
-</script> -->
+</script>
 
 <style scoped>
 h3 {
