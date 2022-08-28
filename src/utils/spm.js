@@ -13,8 +13,8 @@ export function init(hookArray = []) {
     const spmText = spmTextArray.reverse().join('.')
 
     // 依次运行hook，并将spm字符串传入
-    hooks.forEach(callback => {
-      callback(spmText)
+    hooks.forEach(hook => {
+      hook(spmText)
     })
   })
 }
@@ -25,8 +25,8 @@ export function addHook(hook) {
 }
 
 // 移除hook
-export function removeHook(callback) {
-  const removeIndex = hooks.findIndex(cb => cb === callback)
+export function removeHook(removeHookItem) {
+  const removeIndex = hooks.findIndex(hook => hook === removeHookItem)
   hooks.splice(removeIndex, 1)
 }
 
