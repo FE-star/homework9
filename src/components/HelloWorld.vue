@@ -1,141 +1,51 @@
 <template>
-  <div class="hello" data-spma="aa" @click="click">
+  <div class="hello" data-spma="aa">
     <span>show spm:{{ spmText }}</span>
     <!-- 加了一层div，模拟非每层元素都有spm数据的场景 -->
     <div>
       <div data-spmb="bb">
         <button data-spmc="cc">Click it</button>
       </div>
-      <div data-spmb="dd">
+      <div id="inner" data-spmb="dd">
         <button data-spmc="ff">Click it</button>
+        <InnerButton />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+  import { init, addHook, removeHook } from '../utils/spm'
+  import InnerButton from './InnerButton.vue'
+
   // TODO 利用事件代理实现一个简单的收集spm信息的方法，注意不是针对每一个按钮进行函数绑定。场景：考虑一下如果一个页面中有很多按钮，需要如何处理
   export default {
     name: 'HelloWorld',
+    components: {
+      InnerButton
+    },
     data: () => {
       return {
         spmText: 'xx.xx.xx'
       }
     },
-    methods: {
-      // 由于在document.body上绑定事件无效，此处绑定在div.hello元素上
-      click(event) {
-        this.getSpmText(event.target, event.currentTarget)
-      },
-      // 不断向父级元素查找，直到查找到绑定事件的元素
-      getSpmText(target, currentTarget, arr = []) {
-        // 早点当前元素的spm
-        const targetSpmText = this.findSpmText(target)
-
-        // 如果有spm则存入数组
-        if (targetSpmText) {
-          arr.push(targetSpmText)
-        }
-
-        // 如果查找到绑定事件的元素，就将结果存储并退出循环
-        if (target === currentTarget) {
-          this.spmText = arr.reverse().join('.')
-          return
-          /* 
-为什么使用arr.push再arr.reverse().join('.')？
-一、实际测试了以下几段代码：
-
-
-1. 使用arr.unshift，再arr.join('.')
-
-console.time('array unshift')
-let arr = []
-
-for (let i = 0; i < 100000000; i++) {
-  arr.unshift('aa')
-}
-
-let str = arr.join('.')
-console.timeEnd('array unshift')
-
-循环100W次
-耗时: 1:55.289 (m:ss.mmm)
-
-2. 使用arr.push再arr.reverse().join('.')
-
-console.time('array push')
-let arr = []
-
-for (let i = 0; i < 100000000; i++) {
-  arr.push('aa')
-}
-
-let str = arr.reverse().join('.')
-console.timeEnd('array push')
-
-测试环境：Node.js v16.14.1
-循环100W次
-耗时: 61.79ms
-循环1000W次
-耗时: 672.56ms
-循环1亿次
-耗时: 8.396s
-
-测试环境：Chrome 104.0.5112.101（正式版本） (arm64)
-循环100W次
-耗时: 52.5791015625 ms
-循环1000W次
-耗时: 392.364990234375 ms
-循环1亿次
-耗时: 3324.813232421875 ms
-
-3. 使用String
-
-console.time('string')
-let str = ''
-
-for (let i = 0; i < 100000000; i++) {
-  str = 'aa' + '.' + str
-}
-console.timeEnd('string')
-
-测试环境：Node.js v16.14.1
-循环100W次
-耗时: 84.646ms
-循环1000W次
-耗时: 790.097ms
-循环1亿次
-耗时: 12.251s
-
-测试环境：Chrome 104.0.5112.101（正式版本） (arm64)
-循环100W次
-耗时: 72.958984375 ms
-循环1000W次
-耗时: 751.48486328125 ms
-循环1亿次
-耗时: 6852.30615234375 ms
-
-二、选用Array的原因
-1. 从实际效果来看使用arr.push再arr.reverse().join('.')，和直接用字符串拼接性能差异不大。
-2. 但考虑到用Array性能较高
-3. 使用Array代码逻辑简单，不需要处理字符串拼接结果为aa.bb.cc. ，最后会多一个'.'的问题
- */
-        }
-
-        this.getSpmText(target.parentNode, currentTarget, arr)
-      },
-      // 查找当前元素是否有data-spmx属性，并且其有值
-      // 将data-spmx属性的值返回，无值返回''
-      findSpmText(target) {
-        const dataset = target.dataset
-        const spmKey = Object.keys(dataset).find(key => key.startsWith('spm'))
-
-        if (spmKey && dataset[spmKey]) {
-          return dataset[spmKey]
-        }
-
-        return ''
+    mounted () {
+      const hook = (spmText) => {
+        this.spmText = spmText
       }
+
+      // 为组件添加
+      init([
+        hook
+      ])
+
+      setTimeout(() => {
+        removeHook(hook)
+      }, 3000);
+
+      setTimeout(() => {
+        addHook(hook)
+      }, 5000);
     }
   }
 </script>
