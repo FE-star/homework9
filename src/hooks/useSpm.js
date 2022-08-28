@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { onMounted, ref } from 'vue';
 import { Spm } from '../lib/spm';
+import { Spm_V2 } from '../lib/spm-v2';
 
 export function useSpm() {
     const spmText = ref('');

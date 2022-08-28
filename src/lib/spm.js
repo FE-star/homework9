@@ -1,18 +1,18 @@
 /* eslint-disable */
-import { SyncHook, SyncWaterfallHook } from 'tapable';
+import { SyncHook } from 'tapable';
 const SPM_LOCATION = ['spma', 'spmb', 'spmc', 'spmd'];
-export const EVENT_TYPE = { click: 'click', expose: 'expose' };
-// TODO 每一个按钮都监听，后续要codeing一个document全局事件监听版本
+export const EVENT_TYPE = { click: 'click' };
 export class Spm {
     constructor(defaultEventType = EVENT_TYPE.click) {
         this.hooks = {
             click: new SyncHook(['reportInfo']),
-            expose: new SyncHook()
         };
         this.spmNodeTree = [];
         this.defaultEventType = defaultEventType;
         this.initSpmTree();
-        window.addEventListener('beforeunload', this.destorySpm);
+        window.addEventListener('beforeunload', () => {
+            this.destorySpm(this.spmNodeTree);
+        });
     }
     /**
      * @description 筛选需要埋点的dom并构造树结构
@@ -61,38 +61,42 @@ export class Spm {
      */
     setEventReporter(element, spmInfo) {
         const { spmClick, spmExpose } = spmInfo.nodeInfo || {};
-        if (spmClick) {
-            // TODO
-        } else if (spmExpose) {
-            //TODO
-        } else if (!spmClick && !spmExpose) {
+        if ((!spmClick && !spmExpose) || spmClick) {
             if (this.defaultEventType === EVENT_TYPE.click && spmInfo.children.length <= 0) {
-                element.addEventListener('click', () => {
+                const clickEventHandler = () => {
                     this.handleClick(spmInfo.nodeInfo);
-                });
-                return [EVENT_TYPE.click];
-            }
-            if (this.defaultEventType === EVENT_TYPE.expose) {
-                //TODO
+                };
+                element.addEventListener('click', clickEventHandler);
+                return {
+                    [EVENT_TYPE.click]: clickEventHandler
+                };
             }
         }
+        return {};
     }
 
-    unsetEventReporter(element, nodeInfo) {
-
+    unsetEventReporter(layerNode) {
+        const { node = null, eventsToReport = {} } = layerNode;
+        if (!node) {
+            return;
+        }
+        Object.keys(eventsToReport).forEach(eventName => {
+            element.removeEventListener(eventName, eventsToReport[eventName]);
+        })
     }
 
-    destorySpm() {
-
+    destorySpm(spmNodeTree = []) {
+        for (const node of spmNodeTree) {
+            if (node.children.length <= 0) {
+                this.unsetEventReporter(node);
+            } else {
+                this.destorySpm(node.children || []);
+            }
+        }
     }
 
     handleClick(nodeInfo) {
         const reportInfo = { spmId: nodeInfo.spmId };
         this.hooks.click.call(reportInfo);
     }
-
-    handleExpose(nodeInfo) { }
-
-
-
 }

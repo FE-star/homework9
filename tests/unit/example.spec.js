@@ -1,4 +1,4 @@
-import { shallowMount, mount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import HelloWorld from '@/components/HelloWorld.vue';
 
 jest.setTimeout(10000)
@@ -13,8 +13,8 @@ describe('HelloWorld.vue', () => {
 describe('HelloWorld.vue', () => {
   it('校验第一个按钮的spm是否为aa.dd.ff', async () => {
     const wrapper = shallowMount(HelloWorld, { attachTo: document.body })
-    const button = wrapper.findAll('button')
-    await button[1].trigger('click')
-    expect(wrapper.vm.spmText).toMatch('aa.dd.ff')
+    const button = wrapper.findAll('button');
+    await button[1].trigger('click');
+    expect(wrapper.vm.spmText).toMatch('aa.dd.ff');
   })
 })
