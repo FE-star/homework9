@@ -22,6 +22,7 @@ export default {
   mounted() {
     // 理论上相关代码都应该在单独的sdk js文件内部，但是由于测试用例demo期望结果在和vue的data数据对比，
     // 需要设置vue组件的data所以代码先放在了组件生命周期了
+
     function findSpmAttr(dataset = {}) {
       for(let key in dataset) {
         if (key.startsWith('spm')) {
