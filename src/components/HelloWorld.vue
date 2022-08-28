@@ -39,10 +39,12 @@
         hook
       ])
 
+      // 可以移除hook，这样点击就无效
       setTimeout(() => {
         removeHook(hook)
       }, 3000);
 
+      // 可以添加hook，让点击重新生效
       setTimeout(() => {
         addHook(hook)
       }, 5000);
