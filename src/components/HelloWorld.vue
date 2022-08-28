@@ -29,27 +29,27 @@
         spmText: 'xx.xx.xx'
       }
     },
-    mounted () {
-      const hook = (spmText) => {
+    mounted() {
+      const hook = spmText => {
         this.spmText = spmText
       }
 
       // 初始化信息收集，并传入hook进行数据处理
       // 建议在入口JS文件或入口组件进行初始化
       // 此处为通过用例，在组件中初始化
-      init([
-        hook
-      ])
+      init({
+        hooks: [hook]
+      })
 
       // 可以移除hook，这样点击就无效
       setTimeout(() => {
         removeHook(hook)
-      }, 3000);
+      }, 3000)
 
       // 可以添加hook，让点击重新生效
       setTimeout(() => {
         addHook(hook)
-      }, 5000);
+      }, 5000)
     }
   }
 </script>

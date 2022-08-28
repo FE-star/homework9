@@ -2,11 +2,15 @@
 let hooks = []
 
 // 为document.body绑定事件，获取spm值
-export function init(hookArray = []) {
+export function init(params) {
+  // 支持自定义监听点击的元素
+  const element = params.element ?? document.body
+  // 初始化传入的hook
+  const hookArray = params.hooks ?? []
   // 初始化时存储所有hook
   hooks.push(...hookArray)
 
-  document.body.addEventListener('click', function (event) {
+  element.addEventListener('click', function (event) {
     let spmTextArray = [] // 存储每个元素的spm值
     getSpmText(event.target, event.currentTarget, spmTextArray)
     // 生成spm字符串
