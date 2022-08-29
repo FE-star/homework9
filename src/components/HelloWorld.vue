@@ -11,7 +11,7 @@
 </template>
 
 <script>
-
+// 获取所有spm 开头的值
 function getSPMFromObject(o) {
     if(!o) return;
     if(typeof o !== 'object') return;
