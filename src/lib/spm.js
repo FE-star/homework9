@@ -1,11 +1,12 @@
 /* eslint-disable */
 import { SyncHook } from 'tapable';
 const SPM_LOCATION = ['spma', 'spmb', 'spmc', 'spmd'];
-export const EVENT_TYPE = { click: 'click' };
+export const EVENT_TYPE = { click: 'click', expose: 'expose' };
 export class Spm {
     constructor(defaultEventType = EVENT_TYPE.click) {
         this.hooks = {
             click: new SyncHook(['reportInfo']),
+            expose: new SyncHook(['reportInfo'])
         };
         this.spmNodeTree = [];
         this.defaultEventType = defaultEventType;
@@ -18,7 +19,7 @@ export class Spm {
      * @description 筛选需要埋点的dom并构造树结构
      */
     initSpmTree() {
-        this.spmNodeTree = this.findSpmNode(document, 0, null);
+        this.spmNodeTree = this.generateSpmNodes(document, 0, null);
     }
     /**
      * @param {HTMLElement} range 搜索范围
@@ -26,7 +27,7 @@ export class Spm {
      * @param {any} parent 父节点
      * @returns 当前层次需要埋点上报的dom信息
      */
-    findSpmNode(range, spmLocationIndex, parent) {
+    generateSpmNodes(range, spmLocationIndex, parent) {
         const layerNodes = Array.from(
             range.querySelectorAll(`[data-${SPM_LOCATION[spmLocationIndex]}]`
             ) || [])
@@ -49,7 +50,7 @@ export class Spm {
                 return spmInfo;
             });
         for (const layerNode of layerNodes) {
-            layerNode.children = this.findSpmNode(layerNode.node, spmLocationIndex + 1, layerNode);
+            layerNode.children = this.generateSpmNodes(layerNode.node, spmLocationIndex + 1, layerNode);
             layerNode.eventsToReport = this.setEventReporter(layerNode.node, layerNode);
         }
         return layerNodes;
@@ -61,18 +62,42 @@ export class Spm {
      */
     setEventReporter(element, spmInfo) {
         const { spmClick, spmExpose } = spmInfo.nodeInfo || {};
-        if ((!spmClick && !spmExpose) || spmClick) {
-            if (this.defaultEventType === EVENT_TYPE.click && spmInfo.children.length <= 0) {
-                const clickEventHandler = () => {
-                    this.handleClick(spmInfo.nodeInfo);
-                };
-                element.addEventListener('click', clickEventHandler);
-                return {
-                    [EVENT_TYPE.click]: clickEventHandler
-                };
+        const clickEventHandler = () => {
+            this.handleClick(spmInfo.nodeInfo);
+        };
+        const setClickEventReporter = () => {
+            element.addEventListener('click', clickEventHandler);
+            return {
+                [EVENT_TYPE.click]: clickEventHandler
+            };
+        }
+        const exposeEventHandler = () => {
+            this.handleExpose(spmInfo.nodeInfo);
+        }
+        const setExposeEventReporter = () => {
+            // TODO 处理的有点难看，应该只用一个IntersectionObserver就可以了
+            const io = new IntersectionObserver(exposeEventHandler, { root: document.body });
+            io.observe(element);
+            return {
+                [EVENT_TYPE.expose]: io
             }
         }
-        return {};
+        const eventObj = {};
+        if ((!spmClick && !spmExpose) && spmInfo.children.length <= 0) {
+            if (this.defaultEventType === EVENT_TYPE.click) {
+                return setClickEventReporter();
+            }
+            if (this.defaultEventType === EVENT_TYPE.expose) {
+                return setExposeEventReporter();
+            }
+        }
+        if (spmExpose) {
+            eventObj[EVENT_TYPE.expose] = setExposeEventReporter();
+        }
+        if (spmClick && spmInfo.children.length <= 0) {
+            eventObj[EVENT_TYPE.click] = setClickEventReporter();
+        }
+        return eventObj;
     }
 
     unsetEventReporter(layerNode) {
@@ -81,7 +106,12 @@ export class Spm {
             return;
         }
         Object.keys(eventsToReport).forEach(eventName => {
-            element.removeEventListener(eventName, eventsToReport[eventName]);
+            if (eventName === EVENT_TYPE.click) {
+                element.removeEventListener(eventName, eventsToReport[eventName]);
+            }
+            if (eventName === EVENT_TYPE.expose) {
+                eventsToReport[eventName].disconnect();
+            }
         })
     }
 
@@ -99,4 +129,9 @@ export class Spm {
         const reportInfo = { spmId: nodeInfo.spmId };
         this.hooks.click.call(reportInfo);
     }
+
+    handleExpose(nodeInfo) {
+        const reportInfo = { spmId: nodeInfo.spmId };
+        this.hooks.click.call(reportInfo);
+    };
 }

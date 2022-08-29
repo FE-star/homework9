@@ -7,6 +7,9 @@
     <div data-spmb="dd">
       <button data-spmc="ff" class="buttonB">Click it b</button>
     </div>
+    <div data-spmb="ee" data-spm-expose="true" class="exposeE">
+      expose
+    </div>
   </div>
 </template>
 
