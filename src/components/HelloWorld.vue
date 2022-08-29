@@ -37,19 +37,18 @@ export default {
       return spmObj['spma'] +`${spmObj['spmb'] && '.'}` + spmObj['spmb'] + `${spmObj['spmc'] && '.'}` + spmObj['spmc']
     },
     logClick(e) {
-      const spmObj = {
+      const text = this.findSpm(e?.target, {
         'spma': '',
         'spmb': '',
         'spmc': ''
-      }
-      const text = this.findSpm(e?.target, spmObj)
+      })
       if (text) {
         this.spmText = text
       }
     }
   },
   
-  created: function() {
+  mounted: function() {
     document.body.addEventListener('click', this.logClick)
   },
   unmounted: function() {
