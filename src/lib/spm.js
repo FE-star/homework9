@@ -132,6 +132,6 @@ export class Spm {
 
     handleExpose(nodeInfo) {
         const reportInfo = { spmId: nodeInfo.spmId };
-        this.hooks.click.call(reportInfo);
+        this.hooks.expose.call(reportInfo);
     };
 }
