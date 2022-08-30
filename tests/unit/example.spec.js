@@ -1,8 +1,16 @@
-import { shallowMount, mount } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import HelloWorld from '@/components/HelloWorld.vue';
-import { warn } from 'vue';
 
-jest.setTimeout(10000)
+const observe = jest.fn((ele) => { return ele.dataset });
+const unobserve = jest.fn();
+window.IntersectionObserver = jest.fn((callback, options) => {
+  window.exposeCallback = callback;
+  return {
+    observe,
+    unobserve,
+  };
+})
+
 describe('HelloWorld.vue', () => {
   it('校验第一个按钮的spm是否为aa.bb.cc', async () => {
     const wrapper = shallowMount(HelloWorld, { attachTo: document.body });
@@ -14,8 +22,18 @@ describe('HelloWorld.vue', () => {
 describe('HelloWorld.vue', () => {
   it('校验第一个按钮的spm是否为aa.dd.ff', async () => {
     const wrapper = shallowMount(HelloWorld, { attachTo: document.body })
-    const button = wrapper.findAll('button')
-    await button[1].trigger('click')
-    expect(wrapper.vm.spmText).toMatch('aa.dd.ff')
+    const button = wrapper.findAll('button');
+    await button[1].trigger('click');
+    expect(wrapper.vm.spmText).toMatch('aa.dd.ff');
+  })
+})
+
+describe('HelloWorld.vue', () => {
+  it('粗糙的模拟一下曝光', () => {
+    const wrapper = shallowMount(HelloWorld, { attachTo: document.body });
+    expect(observe).toReturnWith(expect.objectContaining({ spmExpose: 'true', spmb: 'ee' }));
+    const exposeEle = wrapper.find('.exposeE');
+    window.exposeCallback([{ target: exposeEle.wrapperElement }]);
+    expect(wrapper.vm.spmText).toMatch('aa.ee');
   })
 })
