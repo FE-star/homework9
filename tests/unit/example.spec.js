@@ -32,7 +32,8 @@ describe('HelloWorld.vue', () => {
   it('粗糙的模拟一下曝光', () => {
     const wrapper = shallowMount(HelloWorld, { attachTo: document.body });
     expect(observe).toReturnWith(expect.objectContaining({ spmExpose: 'true', spmb: 'ee' }));
-    window.exposeCallback();
+    const exposeEle = wrapper.find('.exposeE');
+    window.exposeCallback([{ target: exposeEle.wrapperElement }]);
     expect(wrapper.vm.spmText).toMatch('aa.ee');
   })
 })
