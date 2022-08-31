@@ -1,5 +1,5 @@
 <template>
-  <div class="hello" data-spma="aa">
+  <div class="hello" data-spma="aa" @click="getSpm">
     <span>show spm:{{spmText}}</span>
     <div data-spmb="bb">
       <button data-spmc="cc">Click it</button>
@@ -16,9 +16,33 @@ export default {
   name: 'HelloWorld',
   data: ()=>{
     return {
-      spmText: 'xx.xx.xx'
+      spmText: 'xx.xx.xx',
     }
-  }
+  },
+  methods: {
+    getSpm(e) {
+      const spmArr = [];
+      let el = e.target;
+      while(el) {
+        const dataset = el.dataset;
+        const spmPrefix = this.getSpmPrefix(dataset)
+        if(spmPrefix) {
+          spmArr.unshift(spmPrefix);
+        }
+        el = el.parentElement
+      }
+      this.spmText = spmArr.join('.')
+    },
+    
+    getSpmPrefix(obj) {
+      for(let key in obj) {
+        const isSpm = key.startsWith('spm');
+        if(isSpm) {
+          return obj[key];
+        }
+      }
+    },
+  },
 }
 </script>
 
