@@ -18,6 +18,30 @@ export default {
     return {
       spmText: 'xx.xx.xx'
     }
+  },
+  mounted() {
+    document.addEventListener('click', this.getSPM)
+  },
+  methods: {
+    getSPM(e) {
+      let currentDom = e.target
+      const spmList = []
+      while (currentDom) {
+        const attrs = currentDom.attributes
+        for(let i=0; i<attrs.length; i++) {
+          const curAttr = attrs[i]
+          if (curAttr.name.indexOf('data-spm') > -1) {
+            spmList.push(curAttr.value)
+          }
+        }
+        if (currentDom.parentElement) {
+          currentDom = currentDom.parentElement
+        } else {
+          break
+        }
+      }
+      this.spmText = spmList.reverse().join('.')
+    }
   }
 }
 </script>
