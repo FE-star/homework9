@@ -1,5 +1,5 @@
 <template>
-  <div class="hello" data-spma="aa">
+  <div class="hello" data-spma="aa" @click="eventAgent">
     <span>show spm:{{spmText}}</span>
     <div data-spmb="bb">
       <button data-spmc="cc">Click it</button>
@@ -17,6 +17,29 @@ export default {
   data: ()=>{
     return {
       spmText: 'xx.xx.xx'
+    }
+  },
+  methods: {
+    eventAgent(e) {
+      const bubblingArr = this.bubblingHandler(e.target, []) 
+      this.spmText = bubblingArr.reverse().join('.')
+    },
+    getSpmValue(datasetObject) {
+      const keys = Object.keys(datasetObject || {})
+      if(!keys.length) return ''
+      const matchKey = keys.find(key => key.includes('spm'))
+      return datasetObject[matchKey] || ''
+    },
+    bubblingHandler(el, bubblingArr) {
+      const currentDatasetValue = this.getSpmValue(el.dataset);
+      if(currentDatasetValue) {
+        bubblingArr.push(currentDatasetValue)
+      }
+      if(el.parentElement) {
+        return this.bubblingHandler(el.parentElement, bubblingArr)
+      }
+    
+      return bubblingArr
     }
   }
 }
