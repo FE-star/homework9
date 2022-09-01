@@ -1,5 +1,5 @@
 <template>
-  <div class="hello" data-spma="aa">
+  <div class="hello" data-spma="aa" @click="eventAgent">
     <span>show spm:{{spmText}}</span>
     <div data-spmb="bb">
       <button data-spmc="cc">Click it</button>
@@ -17,6 +17,40 @@ export default {
   data: ()=>{
     return {
       spmText: 'xx.xx.xx'
+    }
+  },
+  methods: {
+    eventAgent(e) {
+      const target = e.target;
+      const currentTarget = e.currentTarget;
+      this.rootSpmVaue = this.getSpmValue(currentTarget.dataset);
+      const dataValue = this.getSpmValue(target.dataset);
+    
+      // 如果自定义
+      if(!dataValue) return;
+      this.spmArr = [dataValue]
+      const bubblingArr = this.bubblingHandler(target)
+      bubblingArr.push(this.rootSpmVaue)
+
+
+      this.spmText = bubblingArr.reverse().join('.')
+    },
+    getSpmValue(datasetObject) {
+      const keys = Object.keys(datasetObject || {})
+      if(!keys.length) return ''
+      const matchKey = keys.find(key => key.includes('spm'))
+      return datasetObject[matchKey] || ''
+    },
+    bubblingHandler(el) {
+      const parentEl = el.parentElement
+      const currentDatasetValue = this.getSpmValue(parentEl.dataset)
+      if(currentDatasetValue) {
+        this.spmArr.push(currentDatasetValue)
+      }
+      if(currentDatasetValue !== this.rootSpmVaue) {
+        return this.bubblingHandler(parentEl)
+      }
+      return this.spmArr
     }
   }
 }
