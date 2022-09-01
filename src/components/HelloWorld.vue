@@ -18,6 +18,21 @@ export default {
     return {
       spmText: 'xx.xx.xx'
     }
+  },
+  mounted() {
+    const findParent = (node) => {
+      if (!node) return void 0
+      const { parentNode } = node
+      const attr = node.attributes
+      const attrValues = attr && Object.values(attr)
+      const spm = attrValues && attrValues.find(prop => prop.name.includes('data-spm'))
+      return spm && ([spm.value].concat(findParent(parentNode)).filter(prop => prop))
+    }
+    const observerClickEvent = (evt) => {
+      const ret = findParent(evt.target)
+      this.spmText = ret.reverse().join('.')
+    }
+    document.addEventListener('click', observerClickEvent)
   }
 }
 </script>
