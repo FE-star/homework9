@@ -21,18 +21,7 @@ export default {
   },
   methods: {
     eventAgent(e) {
-      const target = e.target;
-      const currentTarget = e.currentTarget;
-      this.rootSpmVaue = this.getSpmValue(currentTarget.dataset);
-      const dataValue = this.getSpmValue(target.dataset);
-    
-      // 如果自定义
-      if(!dataValue) return;
-      this.spmArr = [dataValue]
-      const bubblingArr = this.bubblingHandler(target)
-      bubblingArr.push(this.rootSpmVaue)
-
-
+      const bubblingArr = this.bubblingHandler(e.target, []) 
       this.spmText = bubblingArr.reverse().join('.')
     },
     getSpmValue(datasetObject) {
@@ -41,16 +30,16 @@ export default {
       const matchKey = keys.find(key => key.includes('spm'))
       return datasetObject[matchKey] || ''
     },
-    bubblingHandler(el) {
-      const parentEl = el.parentElement
-      const currentDatasetValue = this.getSpmValue(parentEl.dataset)
+    bubblingHandler(el, bubblingArr) {
+      const currentDatasetValue = this.getSpmValue(el.dataset);
       if(currentDatasetValue) {
-        this.spmArr.push(currentDatasetValue)
+        bubblingArr.push(currentDatasetValue)
       }
-      if(currentDatasetValue !== this.rootSpmVaue) {
-        return this.bubblingHandler(parentEl)
+      if(el.parentElement) {
+        return this.bubblingHandler(el.parentElement, bubblingArr)
       }
-      return this.spmArr
+    
+      return bubblingArr
     }
   }
 }
