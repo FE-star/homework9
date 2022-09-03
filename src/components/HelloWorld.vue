@@ -18,6 +18,27 @@ export default {
     return {
       spmText: 'xx.xx.xx'
     }
+  },
+  mounted() {
+    document.addEventListener('click', (event) => { // 箭头函数
+      if (event.target.nodeName !== 'BUTTON') {
+        return
+      }
+      let eleDom = event.target
+      this.spmText = ''
+      while (eleDom) {
+        Object.keys(eleDom.dataset).forEach((val) => {
+          if(/^spm/.test(val)) {
+            this.spmText += `.${eleDom.dataset[val]}`
+          }
+        })
+        eleDom = eleDom.parentElement
+      }
+      if(this.eleDom !== '') {
+        this.spmText = this.spmText.substring(1)
+        this.spmText = this.spmText.split('').reverse().join('')
+      }
+    })
   }
 }
 </script>
