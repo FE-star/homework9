@@ -12,7 +12,7 @@ describe('HelloWorld.vue', () => {
   })
 })
 describe('HelloWorld.vue', () => {
-  it('校验第一个按钮的spm是否为aa.dd.ff', async () => {
+  it('校验第二个按钮的spm是否为aa.dd.ff', async () => {
     const wrapper = shallowMount(HelloWorld, { attachTo: document.body })
     const button = wrapper.findAll('button')
     await button[1].trigger('click')
