@@ -1,6 +1,6 @@
 <template>
   <div class="hello" data-spma="aa">
-    <span>show spm:{{spmText}}</span>
+    <span>show spm:{{ spmText }}</span>
     <div data-spmb="bb">
       <button data-spmc="cc">Click it</button>
     </div>
@@ -10,16 +10,34 @@
   </div>
 </template>
 
-<script>
-// TODO 利用事件代理实现一个简单的收集spm信息的方法，注意不是针对每一个按钮进行函数绑定。场景：考虑一下如果一个页面中有很多按钮，需要如何处理
-export default {
-  name: 'HelloWorld',
-  data: ()=>{
-    return {
-      spmText: 'xx.xx.xx'
-    }
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+
+let spmText = ref()
+
+const getSpmKey = (dataset) =>
+  dataset
+    ? Object.keys(dataset)?.find((propName) => propName.startsWith('spm'))
+    : undefined
+const getEventFlowNodes = (event) =>
+  event.path || (event.composedPath && event.composedPath()) || []
+const getSpmValue = (spmNode) => spmNode.dataset[getSpmKey(spmNode.dataset)]
+const isSpmNode = (node) => !!getSpmKey(node.dataset)
+const isButton = (node) => node.nodeName === 'BUTTON'
+
+const calculateSpmTextValue = (e) => {
+  const eventNodes = getEventFlowNodes(e)
+  if (isButton(e.target) && isSpmNode(e.target)) {
+    spmText.value = eventNodes
+      .filter(isSpmNode)
+      .map(getSpmValue)
+      .reverse()
+      .join('.')
   }
 }
+
+onMounted(() => document.addEventListener('click', calculateSpmTextValue))
+onUnmounted(() => document.removeEventListener('click', calculateSpmTextValue))
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
