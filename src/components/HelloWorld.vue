@@ -1,5 +1,5 @@
 <template>
-  <div class="hello" data-spma="aa">
+  <div class="hello" data-spma="aa" @click="getSpmText">
     <span>show spm:{{spmText}}</span>
     <div data-spmb="bb">
       <button data-spmc="cc">Click it</button>
@@ -18,6 +18,21 @@ export default {
     return {
       spmText: 'xx.xx.xx'
     }
+  },
+  methods:{
+    getSpmText(e){
+      let arr = [],el = e.target,currentData
+      while (el) {
+        if(el.dataset){
+        Object.keys(el.dataset).map(item=>{
+          currentData =  el.dataset[item]
+        })
+          currentData&&arr.unshift(currentData);
+        }
+          el = el.parentElement;
+      }
+      this.spmText = arr.join('.')
+    },
   }
 }
 </script>
