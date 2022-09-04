@@ -8,10 +8,36 @@
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
+    <!-- <div id="big">
+      <div id="center">
+          <div id="small"></div>
+      </div>
+  </div> -->
+
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     <div id="app"></div>
-    <!-- built files will be auto injected -->
+   
   </body>
+
+<!-- <script>
+  var big = document.querySelector('#big')
+  var center = document.querySelector('#center')
+  var small = document.querySelector('#small')
+  big.onclick = function (e) {
+      console.log('big');
+      console.log(e.target);
+
+  }
+  center.onclick = function () {
+      console.log('center');
+
+  }
+  small.onclick = function () {
+      console.log('small');
+
+  }
+</script> -->
+
 </html>
