@@ -1,5 +1,5 @@
 <template>
-  <div class="hello" data-spma="aa">
+  <div class="hello" data-spma="aa" @click.prevent="handleClick">
     <span>show spm:{{spmText}}</span>
     <div data-spmb="bb">
       <button data-spmc="cc">Click it</button>
@@ -17,6 +17,14 @@ export default {
   data: ()=>{
     return {
       spmText: 'xx.xx.xx'
+    }
+  },
+  methods: {
+    handleClick(e) {
+      const target = e.srcElement || e.target;
+      if (target.nodeName.toLocaleLowerCase() === 'button') {
+        this.spmText = `${target.parentElement.parentElement.dataset.spma}.${target.parentElement.dataset.spmb}.${target.dataset.spmc}`;
+      }
     }
   }
 }
