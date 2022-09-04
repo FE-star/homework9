@@ -1,6 +1,6 @@
 <template>
-  <div class="hello" data-spma="aa">
-    <span>show spm:{{spmText}}</span>
+  <div class="hello" data-spma="aa" @click="handleClick">
+    <span>show spm:{{ spmText }}</span>
     <div data-spmb="bb">
       <button data-spmc="cc">Click it</button>
     </div>
@@ -13,13 +13,35 @@
 <script>
 // TODO 利用事件代理实现一个简单的收集spm信息的方法，注意不是针对每一个按钮进行函数绑定。场景：考虑一下如果一个页面中有很多按钮，需要如何处理
 export default {
-  name: 'HelloWorld',
-  data: ()=>{
+  name: "HelloWorld",
+  data: () => {
     return {
-      spmText: 'xx.xx.xx'
-    }
-  }
-}
+      spmText: "xx.xx.xx",
+    };
+  },
+  methods: {
+    handleClick(e) {
+      function getNodeSpmText(node) {
+        const dataset = node.dataset;
+
+        if (!dataset) return "";
+
+        let spmText = "";
+        Reflect.ownKeys(dataset).forEach((key) => {
+          if (typeof key === "string" && key.startsWith("spm")) {
+            spmText = dataset[key];
+          }
+        });
+
+        const parentSpmText = getNodeSpmText(node.parentNode);
+
+        return parentSpmText ? `${parentSpmText}.${spmText}` : spmText;
+      }
+
+      this.spmText = getNodeSpmText(e.target);
+    },
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
