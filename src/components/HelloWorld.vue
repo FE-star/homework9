@@ -1,5 +1,5 @@
 <template>
-  <div class="hello" data-spma="aa">
+  <div class="hello" data-spma="aa" @click="clickHandler">
     <span>show spm:{{spmText}}</span>
     <div data-spmb="bb">
       <button data-spmc="cc">Click it</button>
@@ -18,7 +18,26 @@ export default {
     return {
       spmText: 'xx.xx.xx'
     }
-  }
+  },
+  methods: {
+    clickHandler(e){
+      let dom = e.target;
+      if(dom.nodeName !== 'BUTTON') return;
+      let spmArray = [];
+
+      while(dom) {
+        Object.keys(dom.dataset).forEach((attr) => {
+          if(/^spm/.test(attr)) {
+            spmArray.unshift(dom.dataset[attr])
+          }
+        })
+
+        dom = dom.parentElement;
+      }
+
+      this.spmText = spmArray.join('.');
+    }
+  },
 }
 </script>
 
